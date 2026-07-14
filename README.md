@@ -1,49 +1,204 @@
-# NEXUS — Personal Operating System
+# yallist
 
-A premium, dark, glassmorphic personal dashboard: daily routine, goals, calendar, focus mode, achievements, and reflections — all stored locally in your browser.
+Yet Another Linked List
 
-## Run locally
+There are many doubly-linked list implementations like it, but this
+one is mine.
 
-```bash
-npm install
-npm run dev
+For when an array would be too big, and a Map can't be iterated in
+reverse order.
+
+
+[![Build Status](https://travis-ci.org/isaacs/yallist.svg?branch=master)](https://travis-ci.org/isaacs/yallist) [![Coverage Status](https://coveralls.io/repos/isaacs/yallist/badge.svg?service=github)](https://coveralls.io/github/isaacs/yallist)
+
+## basic usage
+
+```javascript
+var yallist = require('yallist')
+var myList = yallist.create([1, 2, 3])
+myList.push('foo')
+myList.unshift('bar')
+// of course pop() and shift() are there, too
+console.log(myList.toArray()) // ['bar', 1, 2, 3, 'foo']
+myList.forEach(function (k) {
+  // walk the list head to tail
+})
+myList.forEachReverse(function (k, index, list) {
+  // walk the list tail to head
+})
+var myDoubledList = myList.map(function (k) {
+  return k + k
+})
+// now myDoubledList contains ['barbar', 2, 4, 6, 'foofoo']
+// mapReverse is also a thing
+var myDoubledListReverse = myList.mapReverse(function (k) {
+  return k + k
+}) // ['foofoo', 6, 4, 2, 'barbar']
+
+var reduced = myList.reduce(function (set, entry) {
+  set += entry
+  return set
+}, 'start')
+console.log(reduced) // 'startfoo123bar'
 ```
 
-Then open the printed local URL (usually `http://localhost:5173`).
+## api
 
-## Build for production
+The whole API is considered "public".
 
-```bash
-npm run build
-```
+Functions with the same name as an Array method work more or less the
+same way.
 
-Output goes to `dist/`. Preview it with:
+There's reverse versions of most things because that's the point.
 
-```bash
-npm run preview
-```
+### Yallist
 
-## Deploy
+Default export, the class that holds and manages a list.
 
-`dist/` is a static site — deploy it to Vercel, Netlify, Cloudflare Pages, GitHub Pages, or any static host. No backend required.
+Call it with either a forEach-able (like an array) or a set of
+arguments, to initialize the list.
 
-## What's included in this version
+The Array-ish methods all act like you'd expect.  No magic length,
+though, so if you change that it won't automatically prune or add
+empty spots.
 
-- Entry ritual (Welcome + Today's Insight quote)
-- Dashboard with animated progress ring, streak, focus minutes, quote of the day
-- Daily Routine: add / edit / delete tasks, priority, time estimate, completion with a soft blue glow + "what did you learn" reflection
-- Goals: 30 / 60 / 90 / 180 / 365-day goals with progress tracking
-- Calendar: month view with complete (gold) / in-progress (blue) / missed day states, click a day for details
-- Focus Mode: fullscreen blurred timer (25 / 50 / 90 / custom) with a soft completion chime
-- Achievements: unlockable badges based on streaks and tasks completed
-- Evening Reflection: "What went well / wrong / improve tomorrow"
-- AI Coach banner: contextual nudges based on your last 7 days
-- Everything persists in `localStorage` — nothing is lost on refresh
+### Yallist.create(..)
 
-## Not yet built (see the original brief's "Future Features")
+Alias for Yallist function.  Some people like factories.
 
-Dark/Light toggle, cloud sync, PDF/Excel export, backup import, multiple profiles, AI daily planning, voice notes, habit/book/workout/finance/reading/meditation trackers, life score. These are natural next additions on top of this foundation — ask and I can build any of them next.
+#### yallist.head
 
-## Design tokens
+The first node in the list
 
-Background `#050505` · Card `rgba(255,255,255,0.05)` · Border `rgba(255,255,255,0.10)` · Primary `#007AFF` · Secondary `#5AC8FA` · Accent `#8B5CF6` · Radius `24–34px` · Backdrop blur `25px` · Font: Inter
+#### yallist.tail
+
+The last node in the list
+
+#### yallist.length
+
+The number of nodes in the list.  (Change this at your peril.  It is
+not magic like Array length.)
+
+#### yallist.toArray()
+
+Convert the list to an array.
+
+#### yallist.forEach(fn, [thisp])
+
+Call a function on each item in the list.
+
+#### yallist.forEachReverse(fn, [thisp])
+
+Call a function on each item in the list, in reverse order.
+
+#### yallist.get(n)
+
+Get the data at position `n` in the list.  If you use this a lot,
+probably better off just using an Array.
+
+#### yallist.getReverse(n)
+
+Get the data at position `n`, counting from the tail.
+
+#### yallist.map(fn, thisp)
+
+Create a new Yallist with the result of calling the function on each
+item.
+
+#### yallist.mapReverse(fn, thisp)
+
+Same as `map`, but in reverse.
+
+#### yallist.pop()
+
+Get the data from the list tail, and remove the tail from the list.
+
+#### yallist.push(item, ...)
+
+Insert one or more items to the tail of the list.
+
+#### yallist.reduce(fn, initialValue)
+
+Like Array.reduce.
+
+#### yallist.reduceReverse
+
+Like Array.reduce, but in reverse.
+
+#### yallist.reverse
+
+Reverse the list in place.
+
+#### yallist.shift()
+
+Get the data from the list head, and remove the head from the list.
+
+#### yallist.slice([from], [to])
+
+Just like Array.slice, but returns a new Yallist.
+
+#### yallist.sliceReverse([from], [to])
+
+Just like yallist.slice, but the result is returned in reverse.
+
+#### yallist.toArray()
+
+Create an array representation of the list.
+
+#### yallist.toArrayReverse()
+
+Create a reversed array representation of the list.
+
+#### yallist.unshift(item, ...)
+
+Insert one or more items to the head of the list.
+
+#### yallist.unshiftNode(node)
+
+Move a Node object to the front of the list.  (That is, pull it out of
+wherever it lives, and make it the new head.)
+
+If the node belongs to a different list, then that list will remove it
+first.
+
+#### yallist.pushNode(node)
+
+Move a Node object to the end of the list.  (That is, pull it out of
+wherever it lives, and make it the new tail.)
+
+If the node belongs to a list already, then that list will remove it
+first.
+
+#### yallist.removeNode(node)
+
+Remove a node from the list, preserving referential integrity of head
+and tail and other nodes.
+
+Will throw an error if you try to have a list remove a node that
+doesn't belong to it.
+
+### Yallist.Node
+
+The class that holds the data and is actually the list.
+
+Call with `var n = new Node(value, previousNode, nextNode)`
+
+Note that if you do direct operations on Nodes themselves, it's very
+easy to get into weird states where the list is broken.  Be careful :)
+
+#### node.next
+
+The next node in the list.
+
+#### node.prev
+
+The previous node in the list.
+
+#### node.value
+
+The data the node contains.
+
+#### node.list
+
+The list to which this node belongs.  (Null if it does not belong to
+any list.)
